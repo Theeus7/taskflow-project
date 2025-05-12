@@ -1,0 +1,95 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('../../assets/fundo.jpg');
+    background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+    background-position: center; /* Centraliza a imagem */
+    background-attachment: fixed; /* Faz a imagem não rolar ao descer a página */
+
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2.5rem;
+    margin: auto;
+    margin-top: 200px; 
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+  
+  .login-container h2 {
+    margin-bottom: 2rem;
+    color: #2c3e50;
+    font-size: 1.75rem;
+  }
+  
+  .form-group {
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #34495e;
+  }
+  
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+  }
+  
+  input:focus {
+    border-color: #409eff;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+    outline: none;
+  }
+  
+  input.invalid {
+    border-color: #f56c6c;
+    background-color: #fff5f5;
+  }
+  
+  .error {
+    color: #f56c6c;
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+  
+  button {
+    width: 100%;
+    padding: 0.9rem;
+    background-color: #409eff;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover:not([disabled]) {
+    background-color: #337ecc;
+  }
+  
+  button[disabled] {
+    background-color: #d3dce6;
+    cursor: not-allowed;
+  }
