@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   max-width: 400px;
   margin: 50px auto;
   padding: 20px;
@@ -98,18 +98,18 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.register-link {
+.login-link {
   text-align: center;
   margin-top: 15px;
   font-size: 14px;
   color: #666;
 }
 
-.register-link a {
+.login-link a {
   color: #4a90e2;
   text-decoration: none;
 }
 
-.register-link a:hover {
+.login-link a:hover {
   text-decoration: underline;
 }

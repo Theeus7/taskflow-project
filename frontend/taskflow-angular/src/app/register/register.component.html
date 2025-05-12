@@ -1,0 +1,76 @@
+<div class="register-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+    <h2>Criar Conta</h2>
+    <p class="subtitle">Preencha os campos abaixo para se registrar</p>
+
+    <div class="form-group">
+      <label for="username">Nome de Usuário:</label>
+      <div class="input-wrapper">
+        <i class="fa fa-user icon"></i>
+        <input
+          id="username"
+          formControlName="username"
+          type="text"
+          placeholder="Seu nome de usuário"
+          [class.invalid]="usernameInvalid"
+        />
+      </div>
+      <small class="error" *ngIf="usernameInvalid">Nome de usuário é obrigatório.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <div class="input-wrapper">
+        <i class="fa fa-envelope icon"></i>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          placeholder="seuemail@exemplo.com"
+          [class.invalid]="emailInvalid"
+        />
+      </div>
+      <small class="error" *ngIf="emailInvalid">Digite um email válido.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha:</label>
+      <div class="input-wrapper">
+        <i class="fa fa-lock icon"></i>
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
+          placeholder="••••••••"
+          [class.invalid]="passwordInvalid"
+        />
+      </div>
+      <small class="error" *ngIf="passwordInvalid">A senha deve ter pelo menos 6 caracteres.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar Senha:</label>
+      <div class="input-wrapper">
+        <i class="fa fa-lock icon"></i>
+        <input
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          type="password"
+          placeholder="••••••••"
+          [class.invalid]="confirmPasswordInvalid"
+        />
+      </div>
+      <small class="error" *ngIf="confirmPasswordInvalid">As senhas não coincidem.</small>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid">Registrar</button>
+    
+    <div class="login-link">
+      Já tem uma conta? <a routerLink="/login">Faça login</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,134 @@
+<div class="task-list-container">
+  <div class="task-header">
+    <h1>Minhas Tarefas</h1>
+    <button class="btn-add-task" routerLink="/tasks/new">
+      <i class="fas fa-plus"></i> Nova Tarefa
+    </button>
+  </div>
+
+  <div class="filters-container">
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="applyFilters()"
+        placeholder="Buscar tarefas..." 
+        class="search-input"
+      >
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-item">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="todos">Todos</option>
+          <option value="pendente">Pendente</option>
+          <option value="em_andamento">Em Andamento</option>
+          <option value="concluida">Concluída</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="priority-filter">Prioridade:</label>
+        <select id="priority-filter" [(ngModel)]="priorityFilter" (change)="applyFilters()">
+          <option value="todos">Todas</option>
+          <option value="baixa">Baixa</option>
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-table-container">
+    <table class="task-table">
+      <thead>
+        <tr>
+          <th (click)="changeSorting('title')">
+            Título <i class="fas" [ngClass]="getSortIcon('title')"></i>
+          </th>
+          <th (click)="changeSorting('status')">
+            Status <i class="fas" [ngClass]="getSortIcon('status')"></i>
+          </th>
+          <th (click)="changeSorting('priority')">
+            Prioridade <i class="fas" [ngClass]="getSortIcon('priority')"></i>
+          </th>
+          <th (click)="changeSorting('dueDate')">
+            Data Limite <i class="fas" [ngClass]="getSortIcon('dueDate')"></i>
+          </th>
+
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of filteredTasks">
+          <td class="task-title">
+            <div class="title-container">
+              <span>{{ task.title }}</span>
+              <small class="task-description">{{ task.description }}</small>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+              {{ task.status === 'pendente' ? 'Pendente' : 
+                 task.status === 'em_andamento' ? 'Em Andamento' : 'Concluída' }}
+            </span>
+          </td>
+          <td>
+            <span class="priority-badge" [ngClass]="getPriorityClass(task.priority)">
+              {{ task.priority === 'baixa' ? 'Baixa' : 
+                 task.priority === 'media' ? 'Média' : 'Alta' }}
+            </span>
+          </td>
+          <td>{{ task.due_date ? (task.due_date | date:'dd/MM/yyyy') : 'Sem data' }}</td>
+          <td class="actions-cell">
+            <button class="btn-action btn-edit" title="Editar" [routerLink]="['/tasks/edit', task.id || 0]">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-action btn-delete" title="Excluir" (click)="deleteTask(task.id)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredTasks.length === 0">
+          <td colspan="5" class="no-tasks-message">
+            <i class="fas fa-clipboard-list"></i>
+            <p>Nenhuma tarefa encontrada</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)"
+    >
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    
+    <button 
+      *ngFor="let page of getPages()" 
+      class="pagination-btn" 
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)"
+    >
+      {{ page }}
+    </button>
+    
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === totalPages"
+      (click)="goToPage(currentPage + 1)"
+    >
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="task-summary">
+    <p>Exibindo {{ filteredTasks.length }} de {{ tasks.length }} tarefas</p>
+  </div>
+</div>
