@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -11,6 +11,7 @@ import { AuthService } from '../services/auth.service';
   imports: [
     ReactiveFormsModule,
     CommonModule,
+    RouterModule,
   ],
   styleUrls: ['./register.component.css']
 })

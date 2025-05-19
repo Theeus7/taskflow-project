@@ -73,7 +73,7 @@
 }
 
 .search-input {
-  width: 1125px;
+  width: 100%;
   padding: 10px 10px 10px 35px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -326,4 +326,29 @@
     padding: 4px 8px;
     font-size: 12px;
   }
+}
+
+/* Indicador de carregamento */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #666;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.loading-indicator i {
+  color: #4CAF50;
+}
+
+/* Mensagem de erro */
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  text-align: center;
 }

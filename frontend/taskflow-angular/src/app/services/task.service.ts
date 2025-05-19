@@ -32,11 +32,11 @@ export class TaskService {
       .set('skip', skip.toString())
       .set('limit', limit.toString());
       
-    if (status && status !== 'todos') {
+    if (status) {
       params = params.set('status', status);
     }
     
-    if (priority && priority !== 'todos') {
+    if (priority) {
       params = params.set('priority', priority);
     }
     
@@ -47,6 +47,8 @@ export class TaskService {
     if (userId) {
       params = params.set('user_id', userId.toString());
     }
+    
+    console.log('Parâmetros da requisição:', params.toString());
     
     return this.http.get<Task[]>(this.apiUrl, { params });
   }

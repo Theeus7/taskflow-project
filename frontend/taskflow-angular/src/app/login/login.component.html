@@ -37,7 +37,10 @@
       {{ errorMessage }}
     </div>
 
-    <button type="submit" [disabled]="loginForm.invalid">Entrar</button>
+    <button type="submit" [disabled]="loginForm.invalid || isLoading">
+      <span *ngIf="isLoading">Carregando...</span>
+      <span *ngIf="!isLoading">Entrar</span>
+    </button>
     
     <div class="register-link">
       Não tem uma conta? <a routerLink="/register">Registre-se</a>

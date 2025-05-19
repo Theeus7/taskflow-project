@@ -41,13 +41,79 @@ export class TaskListComponent implements OnInit {
   
   loadTasks(): void {
     this.isLoading = true;
+    this.errorMessage = '';
+    
+    // Registrar os valores dos filtros para debug
+    console.log('Carregando tarefas com filtros:', {
+      status: this.statusFilter !== 'todos' ? this.statusFilter : undefined,
+      priority: this.priorityFilter !== 'todos' ? this.priorityFilter : undefined
+    });
+    
     this.taskService.getTasks(
       this.statusFilter !== 'todos' ? this.statusFilter : undefined,
       this.priorityFilter !== 'todos' ? this.priorityFilter : undefined
     ).subscribe({
       next: (tasks) => {
+        console.log('Tarefas carregadas:', tasks);
         this.tasks = tasks;
-        this.applyFilters();
+        
+        // Resetar a página atual para 1 quando os filtros mudam
+        this.currentPage = 1;
+        
+        // Aplicar apenas ordenação e paginação, não filtros de servidor novamente
+        let filtered = [...this.tasks];
+        
+        // Aplicar busca por termo
+        if (this.searchTerm.trim() !== '') {
+          const term = this.searchTerm.toLowerCase().trim();
+          filtered = filtered.filter(task => 
+            task.title.toLowerCase().includes(term) || 
+            (task.description && task.description.toLowerCase().includes(term))
+          );
+        }
+        
+        // Aplicar ordenação
+        filtered.sort((a, b) => {
+          let comparison = 0;
+          
+          switch (this.sortField) {
+            case 'title':
+              comparison = a.title.localeCompare(b.title);
+              break;
+            case 'priority':
+              const priorityOrder = { 'alta': 0, 'media': 1, 'baixa': 2 };
+              comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
+              break;
+            case 'status':
+              const statusOrder = { 'pendente': 0, 'em_andamento': 1, 'concluida': 2 };
+              comparison = statusOrder[a.status] - statusOrder[b.status];
+              break;
+            case 'dueDate':
+              if (a.due_date && b.due_date) {
+                comparison = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+              } else if (a.due_date) {
+                comparison = -1;
+              } else if (b.due_date) {
+                comparison = 1;
+              }
+              break;
+          }
+          
+          return this.sortDirection === 'asc' ? comparison : -comparison;
+        });
+        
+        // Calcular total de páginas
+        this.totalPages = Math.ceil(filtered.length / this.pageSize);
+        
+        // Ajustar página atual se necessário
+        if (this.currentPage > this.totalPages) {
+          this.currentPage = this.totalPages || 1;
+        }
+        
+        // Aplicar paginação
+        const startIndex = (this.currentPage - 1) * this.pageSize;
+        this.filteredTasks = filtered.slice(startIndex, startIndex + this.pageSize);
+        
         this.isLoading = false;
       },
       error: (error) => {
@@ -59,6 +125,12 @@ export class TaskListComponent implements OnInit {
   }
 
   applyFilters(): void {
+    // Se os filtros de status ou prioridade mudaram, recarregar do servidor
+    if (this.statusFilter !== 'todos' || this.priorityFilter !== 'todos') {
+      this.loadTasks();
+      return;
+    }
+    
     let filtered = [...this.tasks];
     
     // Aplicar busca por termo

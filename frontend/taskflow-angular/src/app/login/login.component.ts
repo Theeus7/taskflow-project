@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -11,12 +11,14 @@ import { AuthService } from '../services/auth.service';
   imports: [
     ReactiveFormsModule,
     CommonModule,
+    RouterModule,
   ],
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -31,17 +33,28 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+      this.isLoading = true;
+      this.errorMessage = '';
       
-      this.authService.login(email, password).subscribe({
+      const credentials = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password
+      };
+      
+      this.authService.login(credentials).subscribe({
         next: (response) => {
           console.log('Login bem-sucedido:', response);
-          // Redirecionar para a página principal após o login
+          this.isLoading = false;
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.error('Erro no login:', error);
-          this.errorMessage = error.error?.detail || 'Falha na autenticação. Verifique suas credenciais.';
+          this.isLoading = false;
+          if (typeof error.error === 'object' && error.error !== null) {
+            this.errorMessage = error.error.detail || 'Erro de autenticação';
+          } else {
+            this.errorMessage = error.message || 'Falha na autenticação. Verifique suas credenciais.';
+          }
         }
       });
     }

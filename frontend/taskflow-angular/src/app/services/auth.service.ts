@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 interface UserLogin {
   email: string;
@@ -25,15 +26,34 @@ interface UserResponse {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8000/api/v1/users';
+  private currentUserSubject = new BehaviorSubject<UserResponse | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+  private isBrowser: boolean;
   
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+    
+    // Check if user is stored in localStorage on service initialization (only in browser)
+    if (this.isBrowser) {
+      const userStr = localStorage.getItem('currentUser');
+      if (userStr) {
+        this.currentUserSubject.next(JSON.parse(userStr));
+      }
+    }
+  }
   
-  login(email: string, password: string): Observable<UserResponse> {
-    return this.http.post<UserResponse>(`${this.apiUrl}/login`, { email, password })
+  login(credentials: UserLogin): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(user => {
-          // Armazenar informações do usuário no localStorage
-          localStorage.setItem('currentUser', JSON.stringify(user));
+          // Store user details in local storage (only in browser)
+          if (this.isBrowser) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+          }
+          this.currentUserSubject.next(user);
         })
       );
   }
@@ -43,15 +63,18 @@ export class AuthService {
   }
   
   logout(): void {
-    localStorage.removeItem('currentUser');
+    // Remove user from local storage and reset the subject
+    if (this.isBrowser) {
+      localStorage.removeItem('currentUser');
+    }
+    this.currentUserSubject.next(null);
   }
   
   getCurrentUser(): UserResponse | null {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
+    return this.currentUserSubject.value;
   }
   
   isLoggedIn(): boolean {
-    return !!this.getCurrentUser();
+    return !!this.currentUserSubject.value;
   }
 }

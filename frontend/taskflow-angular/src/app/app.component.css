@@ -1,0 +1,10 @@
+.main-content {
+  padding-top: 60px; /* Altura da navbar */
+  min-height: calc(100vh - 60px);
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 120px; /* Altura da navbar em telas pequenas */
+  }
+}
