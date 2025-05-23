@@ -38,23 +38,28 @@ import { TaskService } from '../services/task.service';
       </div>
     </div>
   `,
+
   styles: [`
     .dashboard-container {
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
       text-align: center;
+      font-family: 'Poppins', 'Roboto', 'Segoe UI', sans-serif;
     }
     
     h1 {
       color: #333;
       margin-bottom: 10px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
     }
     
     p {
       color: #666;
       margin-bottom: 20px;
       font-size: 18px;
+      font-weight: 400;
     }
     
     .dashboard-stats {
@@ -66,39 +71,52 @@ import { TaskService } from '../services/task.service';
     }
     
     .stat-card {
-      background-color: white;
       border-radius: 8px;
       padding: 20px;
       min-width: 150px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     
     .stat-card:hover {
       transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
     .stat-card:nth-child(1) {
-      border-top: 4px solid #FFC107; /* Amarelo para pendentes */
+      background: linear-gradient(135deg, #FFF3CD 0%, #FFE8A1 100%);
+      color: #856404;
+      border: 1px solid rgba(133, 100, 4, 0.2);
     }
     
     .stat-card:nth-child(2) {
-      border-top: 4px solid #2196F3; /* Azul para em andamento */
+      background: linear-gradient(135deg, #CCE5FF 0%, #B8DAFF 100%);
+      color: #004085;
+      border: 1px solid rgba(0, 64, 133, 0.2);
     }
     
     .stat-card:nth-child(3) {
-      border-top: 4px solid #4CAF50; /* Verde para concluídas */
+      background: linear-gradient(135deg, #D4EDDA 0%, #C3E6CB 100%);
+      color: #155724;
+      border: 1px solid rgba(21, 87, 36, 0.2);
     }
     
     .stat-value {
       font-size: 32px;
-      font-weight: bold;
+      font-weight: 700;
       margin-bottom: 5px;
+      letter-spacing: -0.5px;
     }
     
     .stat-label {
-      color: #666;
       font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .dashboard-actions {
@@ -112,32 +130,40 @@ import { TaskService } from '../services/task.service';
     button {
       padding: 12px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
     
     .btn-tasks {
-      background-color: #4CAF50;
-      color: white;
+      background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+      color: #1b5e20;
+      border: 1px solid rgba(21, 87, 36, 0.2);
     }
     
     .btn-tasks:hover {
-      background-color: #45a049;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
     .btn-logout {
-      background-color: #f44336;
-      color: white;
+      background: linear-gradient(135deg, #ef9a9a 0%, #e57373 100%);
+      color: #b71c1c;
+      border: 1px solid rgba(114, 28, 36, 0.2);
     }
     
     .btn-logout:hover {
-      background-color: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
     @media (max-width: 600px) {

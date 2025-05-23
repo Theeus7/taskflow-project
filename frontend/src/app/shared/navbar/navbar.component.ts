@@ -38,36 +38,42 @@ import { Router } from '@angular/router';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #333;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
       color: white;
-      padding: 0 20px;
-      height: 60px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 0 25px;
+      height: 70px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 100;
     }
     
     .navbar-brand a {
       color: white;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 24px;
+      font-weight: 600;
       text-decoration: none;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .navbar-menu {
       display: flex;
-      gap: 20px;
+      gap: 25px;
     }
     
     .navbar-menu a {
-      color: #ddd;
+      color: var(--text-light);
       text-decoration: none;
-      padding: 5px 10px;
-      border-radius: 4px;
+      padding: 8px 15px;
+      border-radius: var(--border-radius);
       transition: all 0.3s;
+      font-weight: 500;
     }
     
     .navbar-menu a:hover, .navbar-menu a.active {
       color: white;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
     }
     
     .navbar-user {
@@ -80,39 +86,48 @@ import { Router } from '@angular/router';
     }
     
     .dropbtn {
-      background-color: transparent;
+      background-color: rgba(255, 255, 255, 0.1);
       color: white;
-      padding: 10px;
+      padding: 10px 15px;
       font-size: 16px;
       border: none;
+      border-radius: var(--border-radius);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    
+    .dropbtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
     }
     
     .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      background-color: #f9f9f9;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      border-radius: 4px;
+      background-color: var(--white);
+      min-width: 180px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      border-radius: var(--border-radius);
       overflow: hidden;
+      margin-top: 5px;
     }
     
     .dropdown-content a {
-      color: black;
-      padding: 12px 16px;
+      color: var(--text-color);
+      padding: 14px 18px;
       text-decoration: none;
       display: block;
-      transition: background-color 0.3s;
+      transition: var(--transition);
+      font-weight: 500;
     }
     
     .dropdown-content a:hover {
-      background-color: #f1f1f1;
+      background-color: var(--gray-light);
+      color: var(--primary-color);
     }
     
     .dropdown:hover .dropdown-content {
@@ -123,22 +138,31 @@ import { Router } from '@angular/router';
       .navbar {
         flex-direction: column;
         height: auto;
-        padding: 10px;
+        padding: 15px;
       }
       
       .navbar-brand, .navbar-menu, .navbar-user {
         width: 100%;
-        margin: 5px 0;
+        margin: 8px 0;
         text-align: center;
       }
       
       .navbar-menu {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
+      }
+      
+      .navbar-menu a {
+        padding: 10px;
       }
       
       .dropdown {
         width: 100%;
+      }
+      
+      .dropbtn {
+        width: 100%;
+        justify-content: center;
       }
       
       .dropdown-content {
