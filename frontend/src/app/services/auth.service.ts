@@ -1,80 +1,70 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { User, UserCredentials, UserRegistration } from '../models/user.model';
+import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-
-interface UserLogin {
-  email: string;
-  password: string;
-}
-
-interface UserRegister {
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface UserResponse {
-  id: number;
-  username: string;
-  email: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8000/api/v1/users';
-  private currentUserSubject = new BehaviorSubject<UserResponse | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-  private isBrowser: boolean;
+  private platformId = inject(PLATFORM_ID);
+  private authStatusSubject = new BehaviorSubject<boolean>(false);
   
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
-  ) {
-    this.isBrowser = isPlatformBrowser(platformId);
-    
-    // Check if user is stored in localStorage on service initialization (only in browser)
-    if (this.isBrowser) {
-      const userStr = localStorage.getItem('currentUser');
-      if (userStr) {
-        this.currentUserSubject.next(JSON.parse(userStr));
-      }
+  // Observable público para componentes se inscreverem
+  public authStatus$ = this.authStatusSubject.asObservable();
+  
+  constructor(private http: HttpClient) {
+    // Inicializa o status de autenticação
+    if (isPlatformBrowser(this.platformId)) {
+      const isLoggedIn = !!localStorage.getItem('currentUser');
+      this.authStatusSubject.next(isLoggedIn);
     }
   }
   
-  login(credentials: UserLogin): Observable<UserResponse> {
-    return this.http.post<UserResponse>(`${this.apiUrl}/login`, credentials)
+  register(user: UserRegistration): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/register`, user);
+  }
+  
+  login(credentials: UserCredentials): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(user => {
-          // Store user details in local storage (only in browser)
-          if (this.isBrowser) {
+          // Armazenar o usuário no localStorage apenas no navegador
+          if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('currentUser', JSON.stringify(user));
+            // Atualiza o status de autenticação
+            this.authStatusSubject.next(true);
           }
-          this.currentUserSubject.next(user);
         })
       );
   }
   
-  register(user: UserRegister): Observable<UserResponse> {
-    return this.http.post<UserResponse>(`${this.apiUrl}/register`, user);
-  }
-  
   logout(): void {
-    // Remove user from local storage and reset the subject
-    if (this.isBrowser) {
+    // Remover o usuário do localStorage apenas no navegador
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('currentUser');
+      // Atualiza o status de autenticação
+      this.authStatusSubject.next(false);
     }
-    this.currentUserSubject.next(null);
-  }
-  
-  getCurrentUser(): UserResponse | null {
-    return this.currentUserSubject.value;
   }
   
   isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    // Verificar se há um usuário no localStorage apenas no navegador
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem('currentUser');
+    }
+    return false;
+  }
+  
+  getCurrentUser(): User | null {
+    // Obter o usuário do localStorage apenas no navegador
+    if (isPlatformBrowser(this.platformId)) {
+      const userJson = localStorage.getItem('currentUser');
+      return userJson ? JSON.parse(userJson) : null;
+    }
+    return null;
   }
 }

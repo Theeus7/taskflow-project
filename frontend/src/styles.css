@@ -1,6 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+/* Importando a fonte Oilvare Base */
+@font-face {
+  font-family: 'Oilvare Base';
+  src: url('/assets/fonts/Avatar-Regular.woff2') format('woff2'),
+       url('/assets/fonts/Avatar-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --primary-color: #3AAFA9;
   --primary-light: #5DDED8;
@@ -19,6 +29,8 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --border-radius: 8px;
   --transition: all 0.3s ease;
+  --font-logo: 'Oilvare Base', sans-serif;
+  --font-main: 'Poppins', 'Roboto', 'Segoe UI', sans-serif;
 }
 
 * {
@@ -28,7 +40,7 @@
 }
 
 body {
-  font-family: 'Poppins', 'Roboto', 'Segoe UI', sans-serif;
+  font-family: var(--font-main);
   background: linear-gradient(135deg, var(--background-color) 0%, var(--gray-light) 100%);
   color: var(--text-color);
   line-height: 1.6;
@@ -49,7 +61,7 @@ a:hover {
 
 button {
   cursor: pointer;
-  font-family: 'Poppins', 'Roboto', sans-serif;
+  font-family: var(--font-main);
   transition: var(--transition);
   font-weight: 600;
   letter-spacing: 0.3px;
@@ -59,6 +71,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--accent-color);
   letter-spacing: -0.5px;
+}
+
+.logo-text {
+  font-family: var(--font-logo);
 }
 
 .card {
@@ -109,7 +125,7 @@ input, select, textarea {
   border: 1px solid var(--gray);
   border-radius: var(--border-radius);
   padding: 10px 15px;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-main);
   transition: var(--transition);
 }
 

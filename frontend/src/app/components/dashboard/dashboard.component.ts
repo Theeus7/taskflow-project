@@ -1,9 +1,10 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { TaskService } from '../services/task.service';
-import Chart from 'chart.js/auto';
+import { AuthService } from '../../services/auth.service';
+import { TaskService } from '../../services/task.service';
+import { Task } from '../../models/task.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,13 +30,6 @@ import Chart from 'chart.js/auto';
         </div>
       </div>
       
-      <div class="chart-container">
-        <h2>Distribuição de Tarefas</h2>
-        <div class="chart-wrapper">
-          <canvas #taskChart width="300" height="300"></canvas>
-        </div>
-      </div>
-      
       <div class="dashboard-actions">
         <button class="btn-tasks" routerLink="/tasks">
           <i class="fas fa-tasks"></i> Ver Minhas Tarefas
@@ -56,16 +50,11 @@ import Chart from 'chart.js/auto';
       font-family: 'Poppins', 'Roboto', 'Segoe UI', sans-serif;
     }
     
-    h1, h2 {
+    h1 {
       color: #333;
       margin-bottom: 10px;
       font-weight: 600;
       letter-spacing: -0.5px;
-    }
-    
-    h2 {
-      font-size: 20px;
-      margin-top: 20px;
     }
     
     p {
@@ -81,23 +70,6 @@ import Chart from 'chart.js/auto';
       gap: 20px;
       margin-bottom: 30px;
       flex-wrap: wrap;
-    }
-    
-    .chart-container {
-      margin: 20px auto 30px;
-      max-width: 400px;
-      padding: 15px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .chart-wrapper {
-      position: relative;
-      width: 100%;
-      height: 300px;
-      display: flex;
-      justify-content: center;
     }
     
     .stat-card {
@@ -209,16 +181,18 @@ import Chart from 'chart.js/auto';
     }
   `]
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
-  @ViewChild('taskChart') private chartRef!: ElementRef;
-  private chart: Chart | undefined;
-  
+export class DashboardComponent implements OnInit, OnDestroy {
   username: string = '';
   taskStats = {
     pendentes: 0,
     emAndamento: 0,
     concluidas: 0
   };
+  
+  // Subscriptions para gerenciar as inscrições
+  private pendingTasksSubscription: Subscription | null = null;
+  private inProgressTasksSubscription: Subscription | null = null;
+  private completedTasksSubscription: Subscription | null = null;
 
   constructor(
     private authService: AuthService, 
@@ -230,93 +204,39 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     const user = this.authService.getCurrentUser();
     if (user) {
       this.username = user.username;
-      this.loadTaskStats();
+      this.subscribeToTaskStats();
     }
   }
-
-  loadTaskStats(): void {
-    // Contador para controlar quando todas as chamadas foram concluídas
-    let completedCalls = 0;
-    
-    // Carregar tarefas pendentes
-    this.taskService.getTasks('pendente').subscribe(tasks => {
-      this.taskStats.pendentes = tasks.length;
-      completedCalls++;
-      if (completedCalls === 3) this.updateChart();
-    });
-
-    // Carregar tarefas em andamento
-    this.taskService.getTasks('em_andamento').subscribe(tasks => {
-      this.taskStats.emAndamento = tasks.length;
-      completedCalls++;
-      if (completedCalls === 3) this.updateChart();
-    });
-
-    // Carregar tarefas concluídas
-    this.taskService.getTasks('concluida').subscribe(tasks => {
-      this.taskStats.concluidas = tasks.length;
-      completedCalls++;
-      if (completedCalls === 3) this.updateChart();
-    });
-  }
   
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.createChart();
-    }, 100);
-  }
-  
-  createChart(): void {
-    const canvas = this.chartRef?.nativeElement;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    // Calcular o total para verificar se há dados
-    const total = this.taskStats.pendentes + this.taskStats.emAndamento + this.taskStats.concluidas;
-    
-    // Se não houver dados, adicionar valores fictícios para mostrar o gráfico
-    const data = total > 0 ? 
-      [this.taskStats.pendentes, this.taskStats.emAndamento, this.taskStats.concluidas] : 
-      [1, 1, 1]; // Valores fictícios para visualização inicial
-    
-    this.chart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: ['Pendentes', 'Em Andamento', 'Concluídas'],
-        datasets: [{
-          data: data,
-          backgroundColor: [
-            '#FFE8A1', // Amarelo para pendentes
-            '#B8DAFF', // Azul para em andamento
-            '#C3E6CB'  // Verde para concluídas
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-  }
-  
-  updateChart(): void {
-    if (!this.chart) {
-      this.createChart();
-      return;
+  ngOnDestroy(): void {
+    // Cancelar todas as inscrições para evitar vazamentos de memória
+    if (this.pendingTasksSubscription) {
+      this.pendingTasksSubscription.unsubscribe();
     }
-    
-    const total = this.taskStats.pendentes + this.taskStats.emAndamento + this.taskStats.concluidas;
-    if (total > 0) {
-      this.chart.data.datasets[0].data = [
-        this.taskStats.pendentes,
-        this.taskStats.emAndamento,
-        this.taskStats.concluidas
-      ];
-      this.chart.update();
+    if (this.inProgressTasksSubscription) {
+      this.inProgressTasksSubscription.unsubscribe();
     }
+    if (this.completedTasksSubscription) {
+      this.completedTasksSubscription.unsubscribe();
+    }
+  }
+  
+  subscribeToTaskStats(): void {
+    // Inscrever-se para receber atualizações das estatísticas de tarefas
+    this.pendingTasksSubscription = this.taskService.pendingTasks$.subscribe(count => {
+      this.taskStats.pendentes = count;
+    });
+    
+    this.inProgressTasksSubscription = this.taskService.inProgressTasks$.subscribe(count => {
+      this.taskStats.emAndamento = count;
+    });
+    
+    this.completedTasksSubscription = this.taskService.completedTasks$.subscribe(count => {
+      this.taskStats.concluidas = count;
+    });
+    
+    // Atualizar as estatísticas
+    this.taskService.refreshTaskStats();
   }
 
   logout(): void {

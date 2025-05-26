@@ -1,17 +1,16 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { TaskListComponent } from './tasks/task-list.component';
-import { TaskFormComponent } from './tasks/task-form/task-form.component';
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './components/auth/login/login.component';
+import { RegisterComponent } from './components/auth/register/register.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { TaskListComponent } from './components/tasks/task-list.component';
+import { TaskFormComponent } from './components/tasks/task-form/task-form.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',  // Rota principal ou home
-    component: HomeComponent,
-    pathMatch: 'full'
+    component: HomeComponent
   },
   {
     path: 'login',  // A rota para o LoginComponent

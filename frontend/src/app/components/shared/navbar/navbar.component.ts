@@ -1,10 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { User } from '../../models/user.model';
-import { Subscription } from 'rxjs';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,10 +11,7 @@ import { Subscription } from 'rxjs';
   template: `
     <nav class="navbar" *ngIf="isLoggedIn">
       <div class="navbar-brand">
-        <div class="logo-container">
-          <a routerLink="/dashboard" class="logo-text">TaskFlow</a>
-          <span class="logo-subtitle logo-text">Fluxo Ideal, Tarefas em Ordem</span>
-        </div>
+        <a routerLink="/dashboard">TaskFlow</a>
       </div>
       
       <div class="navbar-menu">
@@ -25,12 +20,12 @@ import { Subscription } from 'rxjs';
       </div>
       
       <div class="navbar-user">
-        <div class="dropdown" (mouseenter)="showDropdown()" (mouseleave)="hideDropdownWithDelay()">
+        <div class="dropdown">
           <button class="dropbtn">
             <i class="fas fa-user"></i> {{ username }}
             <i class="fas fa-caret-down"></i>
           </button>
-          <div class="dropdown-content" [class.show]="isDropdownVisible">
+          <div class="dropdown-content">
             <a routerLink="/dashboard">Perfil</a>
             <a href="#" (click)="logout($event)">Sair</a>
           </div>
@@ -40,8 +35,8 @@ import { Subscription } from 'rxjs';
   `,
   styles: [`
     .navbar {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
       background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
       color: white;
@@ -52,40 +47,17 @@ import { Subscription } from 'rxjs';
       z-index: 100;
     }
     
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      line-height: 1;
-    }
-
-    .logo-text {
+    .navbar-brand a {
       color: white;
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 600;
       text-decoration: none;
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      font-family: var(--font-logo);
-    }
-
-    .logo-subtitle {
-      font-size: 12px;
-      font-weight: 400;
-      color: white;
-      opacity: 0.8;
-      margin-top: 2px;
-      margin-left: 60px;
     }
     
     .navbar-menu {
       display: flex;
-      justify-content: center;
       gap: 25px;
     }
     
@@ -105,8 +77,6 @@ import { Subscription } from 'rxjs';
     }
     
     .navbar-user {
-      display: flex;
-      justify-content: flex-end;
       position: relative;
     }
     
@@ -160,16 +130,15 @@ import { Subscription } from 'rxjs';
       color: var(--primary-color);
     }
     
-    .dropdown-content.show {
+    .dropdown:hover .dropdown-content {
       display: block;
     }
     
     @media (max-width: 768px) {
       .navbar {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        padding: 15px;
+        flex-direction: column;
         height: auto;
+        padding: 15px;
       }
       
       .navbar-brand, .navbar-menu, .navbar-user {
@@ -185,10 +154,6 @@ import { Subscription } from 'rxjs';
       
       .navbar-menu a {
         padding: 10px;
-      }
-      
-      .navbar-user {
-        justify-content: center;
       }
       
       .dropdown {
@@ -207,52 +172,17 @@ import { Subscription } from 'rxjs';
     }
   `]
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent implements OnInit {
   isLoggedIn: boolean = false;
   username: string = '';
-  isDropdownVisible: boolean = false;
-  private dropdownTimeout: any;
-  private authSubscription: Subscription | null = null;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Inicializa o estado com o valor atual
-    this.isLoggedIn = this.authService.isLoggedIn();
+    // Usar getCurrentUser em vez de currentUser$
     const user = this.authService.getCurrentUser();
+    this.isLoggedIn = !!user;
     this.username = user?.username || '';
-    
-    // Inscreve-se para receber atualizações de status de autenticação
-    this.authSubscription = this.authService.authStatus$.subscribe(isLoggedIn => {
-      this.isLoggedIn = isLoggedIn;
-      if (isLoggedIn) {
-        const user = this.authService.getCurrentUser();
-        this.username = user?.username || '';
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    // Cancela a inscrição para evitar vazamentos de memória
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
-  }
-
-  showDropdown(): void {
-    // Cancelar qualquer timeout pendente
-    if (this.dropdownTimeout) {
-      clearTimeout(this.dropdownTimeout);
-      this.dropdownTimeout = null;
-    }
-    this.isDropdownVisible = true;
-  }
-
-  hideDropdownWithDelay(): void {
-    // Configurar um timeout para esconder o dropdown após um atraso
-    this.dropdownTimeout = setTimeout(() => {
-      this.isDropdownVisible = false;
-    }, 500); // 500ms de atraso antes de fechar
   }
 
   logout(event: Event): void {

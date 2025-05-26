@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
+    # Database settings
+    MYSQL_USER: str = "root"
+    MYSQL_PASSWORD: str = "password"
+    MYSQL_HOST: str = "localhost"
+    MYSQL_PORT: str = "3306"
+    MYSQL_DB: str = "taskflow"
+    
     class Config:
         env_file = ".env"
 
