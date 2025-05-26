@@ -4,12 +4,13 @@ import { RegisterComponent } from './register/register.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TaskListComponent } from './tasks/task-list.component';
 import { TaskFormComponent } from './tasks/task-form/task-form.component';
+import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',  // Rota principal ou home
-    redirectTo: '/login',  // Redireciona para o LoginComponent
+    component: HomeComponent,
     pathMatch: 'full'
   },
   {
