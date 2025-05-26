@@ -21,7 +21,7 @@
     <div class="filter-group">
       <div class="filter-item">
         <label for="status-filter">Status:</label>
-        <select id="status-filter" [(ngModel)]="statusFilter" (change)="loadTasks()">
+        <select id="status-filter" [(ngModel)]="statusFilter" (change)="applyFilters()">
           <option value="todos">Todos</option>
           <option value="pendente">Pendente</option>
           <option value="em_andamento">Em Andamento</option>
@@ -31,7 +31,7 @@
 
       <div class="filter-item">
         <label for="priority-filter">Prioridade:</label>
-        <select id="priority-filter" [(ngModel)]="priorityFilter" (change)="loadTasks()">
+        <select id="priority-filter" [(ngModel)]="priorityFilter" (change)="applyFilters()">
           <option value="todos">Todas</option>
           <option value="baixa">Baixa</option>
           <option value="media">Média</option>

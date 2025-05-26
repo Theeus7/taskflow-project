@@ -135,13 +135,18 @@ export class TaskListComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    // Se os filtros de status ou prioridade mudaram, recarregar do servidor
-    if (this.statusFilter !== 'todos' || this.priorityFilter !== 'todos') {
-      this.loadTasks();
-      return;
+    // Começamos com todas as tarefas
+    let filtered = [...this.tasks];
+    
+    // Aplicar filtro de status
+    if (this.statusFilter !== 'todos') {
+      filtered = filtered.filter(task => task.status === this.statusFilter);
     }
     
-    let filtered = [...this.tasks];
+    // Aplicar filtro de prioridade
+    if (this.priorityFilter !== 'todos') {
+      filtered = filtered.filter(task => task.priority === this.priorityFilter);
+    }
     
     // Aplicar busca por termo
     if (this.searchTerm.trim() !== '') {
@@ -152,7 +157,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
       );
     }
     
-    // Aplicar ordenação padrão por status e prioridade
+    // Aplicar ordenação
     filtered.sort((a, b) => {
       // Ordem de status: pendente (0), em_andamento (1), concluida (2)
       const statusOrder = { 'pendente': 0, 'em_andamento': 1, 'concluida': 2 };
