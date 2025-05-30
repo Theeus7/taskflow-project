@@ -34,7 +34,7 @@ import { PublicNavbarComponent } from '../components/shared/public-navbar/public
               <i class="fas fa-chart-line"></i>
             </div>
             <h3>Acompanhe Progresso</h3>
-            <p>Visualize estatísticas e acompanhe seu desempenho com gráficos intuitivos.</p>
+            <p>Visualize estatísticas e acompanhe seu desempenho.</p>
           </div>
           
           <div class="feature-card">
