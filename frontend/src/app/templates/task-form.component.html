@@ -55,10 +55,15 @@
     <div class="form-group">
       <label for="due_date">Data Limite</label>
       <input 
-        type="date" 
+        type="text" 
         id="due_date" 
         formControlName="due_date"
+        placeholder="DD/MM/AAAA"
+        [class.invalid]="taskForm.get('due_date')?.invalid && taskForm.get('due_date')?.touched"
       >
+      <div class="error-message" *ngIf="taskForm.get('due_date')?.invalid && taskForm.get('due_date')?.touched">
+        <span *ngIf="taskForm.get('due_date')?.errors?.['pattern']">Formato inválido. Use DD/MM/AAAA</span>
+      </div>
     </div>
 
     <div class="error-alert" *ngIf="errorMessage">

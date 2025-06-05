@@ -30,7 +30,7 @@ export class TaskFormComponent implements OnInit {
       description: [''],
       status: ['pendente', Validators.required],
       priority: ['media', Validators.required],
-      due_date: ['']
+      due_date: ['', [Validators.pattern(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/)]]
     });
   }
   
@@ -48,8 +48,15 @@ export class TaskFormComponent implements OnInit {
   loadTask(id: number): void {
     this.taskService.getTask(id).subscribe({
       next: (task) => {
-        // Formatar a data para o formato YYYY-MM-DD para o input date
-        const dueDate = task.due_date ? task.due_date.split('T')[0] : '';
+        // Formatar a data para o formato DD/MM/AAAA
+        let dueDate = '';
+        if (task.due_date) {
+          const date = new Date(task.due_date);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          dueDate = `${day}/${month}/${year}`;
+        }
         
         this.taskForm.patchValue({
           title: task.title,
@@ -70,12 +77,19 @@ export class TaskFormComponent implements OnInit {
     if (this.taskForm.valid) {
       this.isSubmitting = true;
       
+      // Converter a data do formato brasileiro para o formato ISO
+      let isoDate: string | undefined = undefined;
+      if (this.taskForm.value.due_date) {
+        const [day, month, year] = this.taskForm.value.due_date.split('/');
+        isoDate = `${year}-${month}-${day}`;
+      }
+      
       const task: Task = {
         title: this.taskForm.value.title,
         description: this.taskForm.value.description,
         status: this.taskForm.value.status,
         priority: this.taskForm.value.priority,
-        due_date: this.taskForm.value.due_date
+        due_date: isoDate
       };
       
       if (this.isEditMode && this.taskId) {

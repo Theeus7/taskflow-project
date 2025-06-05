@@ -107,4 +107,9 @@ export class TaskService {
       tap(() => this.refreshTaskStats())
     );
   }
+  
+  // Métodos para administração de tarefas
+  getAllTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/admin/all`);
+  }
 }

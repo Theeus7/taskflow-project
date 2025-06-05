@@ -5,7 +5,11 @@ import { RegisterComponent } from './components/auth/register/register.component
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TaskListComponent } from './components/tasks/task-list.component';
 import { TaskFormComponent } from './components/tasks/task-form/task-form.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { CreateAdminComponent } from './components/admin/create-admin.component';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -19,6 +23,10 @@ export const routes: Routes = [
   {
     path: 'register',  // A rota para o RegisterComponent
     component: RegisterComponent
+  },
+  {
+    path: 'create-admin',  // Rota para criar administrador
+    component: CreateAdminComponent
   },
   {
     path: 'dashboard',  // Rota protegida para o dashboard
@@ -39,5 +47,15 @@ export const routes: Routes = [
     path: 'tasks/edit/:id',  // Rota para editar tarefa existente
     component: TaskFormComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile',  // Rota para o perfil do usuário
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',  // Rota para o painel de administração
+    component: AdminComponent,
+    canActivate: [AuthGuard, AdminGuard]
   }
 ];

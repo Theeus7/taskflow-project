@@ -180,7 +180,68 @@ export class TaskListComponent implements OnInit, OnDestroy {
       this.sortDirection = 'asc';
     }
     
-    this.applyFilters();
+    // Aplicar ordenação localmente sem recarregar do servidor
+    let filtered = [...this.tasks];
+    
+    // Aplicar busca por termo
+    if (this.searchTerm.trim() !== '') {
+      const term = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(term) || 
+        (task.description && task.description.toLowerCase().includes(term))
+      );
+    }
+    
+    // Aplicar ordenação
+    filtered.sort((a, b) => {
+      // Ordem de status: pendente (0), em_andamento (1), concluida (2)
+      const statusOrder: Record<string, number> = { 'pendente': 0, 'em_andamento': 1, 'concluida': 2 };
+      // Ordem de prioridade: alta (0), media (1), baixa (2)
+      const priorityOrder: Record<string, number> = { 'alta': 0, 'media': 1, 'baixa': 2 };
+      
+      let comparison = 0;
+      
+      switch (this.sortField) {
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'status':
+          comparison = statusOrder[a.status] - statusOrder[b.status];
+          break;
+        case 'priority':
+          comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
+          break;
+        case 'dueDate':
+          if (a.due_date && b.due_date) {
+            comparison = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+          } else if (a.due_date) {
+            comparison = -1;
+          } else if (b.due_date) {
+            comparison = 1;
+          }
+          break;
+        default:
+          // Ordenação padrão por status e prioridade
+          if (a.status !== b.status) {
+            return statusOrder[a.status] - statusOrder[b.status];
+          }
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+      }
+      
+      return this.sortDirection === 'asc' ? comparison : -comparison;
+    });
+    
+    // Calcular total de páginas
+    this.totalPages = Math.ceil(filtered.length / this.pageSize);
+    
+    // Ajustar página atual se necessário
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages || 1;
+    }
+    
+    // Aplicar paginação
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredTasks = filtered.slice(startIndex, startIndex + this.pageSize);
   }
   
   getSortIcon(field: string): string {

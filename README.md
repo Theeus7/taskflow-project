@@ -119,7 +119,9 @@ ng serve
 - Dashboard com estatísticas de tarefas
 - Lista com filtros e formulário para cadastrar tarefas
 
-_(inserir prints ou gifs aqui)_
+![Tela de login](images/login.png)
+![Dashboard](images/dashboard.png)
+![Lista de Tarefas](images/tarefas.png)
 
 ---
 

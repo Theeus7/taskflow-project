@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
-import { User, UserCredentials, UserRegistration } from '../models/user.model';
+import { User, UserCredentials, UserRegistration, UserProfileUpdate } from '../models/user.model';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -29,6 +29,12 @@ export class AuthService {
   }
   
   login(credentials: UserCredentials): Observable<User> {
+    // Primeiro, garantir que qualquer sessão anterior seja removida
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('currentUser');
+      this.authStatusSubject.next(false);
+    }
+    
     return this.http.post<User>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(user => {
@@ -66,5 +72,42 @@ export class AuthService {
       return userJson ? JSON.parse(userJson) : null;
     }
     return null;
+  }
+  
+  updateProfile(profileUpdate: UserProfileUpdate): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/profile`, profileUpdate)
+      .pipe(
+        tap(updatedUser => {
+          // Atualizar o usuário no localStorage
+          this.updateCurrentUser(updatedUser);
+        })
+      );
+  }
+  
+  updateCurrentUser(user: User): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+  }
+  
+  // Métodos para administração de usuários
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/admin/users`);
+  }
+  
+  createUser(userData: any): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/admin/users`, userData);
+  }
+  
+  createAdmin(userData: any): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/register`, userData);
+  }
+  
+  updateUser(userId: number, userData: any): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/admin/users/${userId}`, userData);
+  }
+  
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/admin/users/${userId}`);
   }
 }

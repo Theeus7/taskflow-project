@@ -30,9 +30,17 @@ import { Subscription } from 'rxjs';
         </div>
       </div>
       
+      <!-- Gráfico removido conforme solicitado -->
+      
       <div class="dashboard-actions">
         <button class="btn-tasks" routerLink="/tasks">
           <i class="fas fa-tasks"></i> Ver Minhas Tarefas
+        </button>
+        <button class="btn-profile" routerLink="/profile">
+          <i class="fas fa-user"></i> Meu Perfil
+        </button>
+        <button class="btn-admin" *ngIf="isAdmin" routerLink="/admin">
+          <i class="fas fa-users-cog"></i> Painel Admin
         </button>
         <button class="btn-logout" (click)="logout()">
           <i class="fas fa-sign-out-alt"></i> Sair
@@ -121,6 +129,110 @@ import { Subscription } from 'rxjs';
       letter-spacing: 0.5px;
     }
     
+    .pie-chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .pie-chart {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .pie-slice {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 50%;
+      transition: all 0.3s;
+    }
+    
+    .pie-slice {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+      transform-origin: center;
+    }
+    
+    .pie-slice.pendente {
+      background: #FFE8A1;
+      clip-path: polygon(
+        50% 50%,
+        50% 0%,
+        calc(50% + 50% * cos(calc(var(--percentage) * 3.6deg))) calc(50% - 50% * sin(calc(var(--percentage) * 3.6deg)))
+      );
+      transform: rotate(0deg);
+      z-index: 3;
+    }
+    
+    .pie-slice.em-andamento {
+      background: #B8DAFF;
+      clip-path: polygon(
+        50% 50%,
+        50% 0%,
+        calc(50% + 50% * cos(calc(var(--percentage) * 3.6deg))) calc(50% - 50% * sin(calc(var(--percentage) * 3.6deg)))
+      );
+      transform: rotate(calc(var(--start-angle) * 3.6deg));
+      z-index: 2;
+    }
+    
+    .pie-slice.concluida {
+      background: #C3E6CB;
+      clip-path: polygon(
+        50% 50%,
+        50% 0%,
+        calc(50% + 50% * cos(calc(var(--percentage) * 3.6deg))) calc(50% - 50% * sin(calc(var(--percentage) * 3.6deg)))
+      );
+      transform: rotate(calc(var(--start-angle) * 3.6deg));
+      z-index: 1;
+    }
+    
+    .chart-legend {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .legend-color.pendente {
+      background: #FFE8A1;
+    }
+    
+    .legend-color.em-andamento {
+      background: #B8DAFF;
+    }
+    
+    .legend-color.concluida {
+      background: #C3E6CB;
+    }
+    
+    .legend-label {
+      font-size: 14px;
+      color: #555;
+    }
+    
     .dashboard-actions {
       display: flex;
       flex-direction: column;
@@ -157,6 +269,28 @@ import { Subscription } from 'rxjs';
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
+    .btn-profile {
+      background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+      color: #0d47a1;
+      border: 1px solid rgba(13, 71, 161, 0.2);
+    }
+    
+    .btn-profile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-admin {
+      background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+      color: #e65100;
+      border: 1px solid rgba(230, 81, 0, 0.2);
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
     .btn-logout {
       background: linear-gradient(135deg, #ef9a9a 0%, #e57373 100%);
       color: #b71c1c;
@@ -178,16 +312,23 @@ import { Subscription } from 'rxjs';
         width: 100%;
         max-width: 250px;
       }
+      
+      .pie-chart-container {
+        max-width: 300px;
+      }
     }
   `]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   username: string = '';
+  isAdmin: boolean = false;
   taskStats = {
     pendentes: 0,
     emAndamento: 0,
     concluidas: 0
   };
+  
+  // Dados do gráfico removidos
   
   // Subscriptions para gerenciar as inscrições
   private pendingTasksSubscription: Subscription | null = null;
@@ -204,6 +345,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const user = this.authService.getCurrentUser();
     if (user) {
       this.username = user.username;
+      this.isAdmin = user.role === 'admin';
       this.subscribeToTaskStats();
     }
   }
@@ -238,6 +380,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Atualizar as estatísticas
     this.taskService.refreshTaskStats();
   }
+  
+  // Método de atualização do gráfico removido
 
   logout(): void {
     this.authService.logout();

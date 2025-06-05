@@ -218,7 +218,8 @@ export class TaskListComponent implements OnInit, OnDestroy {
       this.sortDirection = 'asc';
     }
     
-    this.applyFilters();
+    // Recarregar a ordenação
+    this.loadTasks();
   }
 
   getSortIcon(field: string): string {
