@@ -18,11 +18,11 @@ import { Subscription } from 'rxjs';
       <div class="dashboard-stats">
         <div class="stat-card">
           <div class="stat-value">{{ taskStats.pendentes }}</div>
-          <div class="stat-label">Tarefas Pendentes</div>
+          <div class="stat-label">A Fazer</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">{{ taskStats.emAndamento }}</div>
-          <div class="stat-label">Em Andamento</div>
+          <div class="stat-label">Em<br>Andamento</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">{{ taskStats.concluidas }}</div>

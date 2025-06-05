@@ -502,3 +502,37 @@
   margin-top: 10px;
   text-align: center;
 }
+/* Estilo para a célula de data editável */
+.date-cell {
+  cursor: pointer;
+  position: relative;
+}
+
+.date-cell:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.date-cell input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+/* Estilo para a célula de data editável */
+.date-cell {
+  cursor: pointer;
+  position: relative;
+}
+
+.date-cell:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.date-cell input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}

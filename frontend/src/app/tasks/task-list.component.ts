@@ -20,6 +20,9 @@ export class TaskListComponent implements OnInit, OnDestroy {
   priorityFilter: string = 'todos';
   searchTerm: string = '';
   
+  // Edição de data
+  editingTaskId: number | null = null;
+  
   // Ordenação
   sortField: string = 'dueDate';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -135,6 +138,12 @@ export class TaskListComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
+    // Recarregar tarefas do servidor quando os filtros de status ou prioridade mudam
+    if (this.statusFilter !== 'todos' || this.priorityFilter !== 'todos') {
+      this.loadTasks();
+      return;
+    }
+    
     // Começamos com todas as tarefas
     let filtered = [...this.tasks];
     
@@ -373,6 +382,52 @@ export class TaskListComponent implements OnInit, OnDestroy {
   }
   
   // Método para limpar recursos quando o componente é destruído
+  // Métodos para edição de data
+  openDatePicker(task: Task): void {
+    this.editingTaskId = task.id || null;
+    setTimeout(() => {
+      const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+      if (dateInput) {
+        dateInput.focus();
+        dateInput.click();
+      }
+    }, 10);
+  }
+  
+  updateTaskDate(task: Task, event: Event): void {
+    const newDate = (event.target as HTMLInputElement).value;
+    if (newDate) {
+      this.taskService.updateTask(task.id!, { due_date: newDate }).subscribe({
+        next: () => {
+          task.due_date = newDate;
+          this.editingTaskId = null;
+          // Recarregar a página para garantir que as alterações sejam aplicadas
+          window.location.reload();
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar data da tarefa:', error);
+          alert('Não foi possível atualizar a data da tarefa. Por favor, tente novamente.');
+          this.editingTaskId = null;
+        }
+      });
+    } else {
+      // Se a data for removida
+      this.taskService.updateTask(task.id!, { due_date: null }).subscribe({
+        next: () => {
+          task.due_date = null;
+          this.editingTaskId = null;
+          // Recarregar a página para garantir que as alterações sejam aplicadas
+          window.location.reload();
+        },
+        error: (error) => {
+          console.error('Erro ao remover data da tarefa:', error);
+          alert('Não foi possível remover a data da tarefa. Por favor, tente novamente.');
+          this.editingTaskId = null;
+        }
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     this.removeClickListener();
     if (this.closeDropdownTimeout) {
@@ -388,6 +443,8 @@ export class TaskListComponent implements OnInit, OnDestroy {
         task.status = newStatus;
         // Fecha o dropdown após a seleção
         this.closeAllDropdowns();
+        // Recarregar a lista de tarefas do servidor
+        window.location.reload();
       },
       error: (error) => {
         console.error('Erro ao atualizar status da tarefa:', error);
@@ -404,6 +461,8 @@ export class TaskListComponent implements OnInit, OnDestroy {
         task.priority = newPriority;
         // Fecha o dropdown após a seleção
         this.closeAllDropdowns();
+        // Recarregar a lista de tarefas do servidor
+        window.location.reload();
       },
       error: (error) => {
         console.error('Erro ao atualizar prioridade da tarefa:', error);
